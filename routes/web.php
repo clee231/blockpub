@@ -14,3 +14,6 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('peers', 'PeerController@getPeers');
+Route::get('peer/add', 'PeerController@add');
