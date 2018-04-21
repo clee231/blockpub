@@ -17,3 +17,4 @@ Route::get('/', function () {
 
 Route::get('peers', 'PeerController@getPeers');
 Route::get('peer/add', 'PeerController@add');
+Route::get('peers/invalidate', 'PeerController@invalidate');

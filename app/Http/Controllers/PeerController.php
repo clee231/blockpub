@@ -17,12 +17,12 @@ class PeerController extends Controller
 		$diff->subHour();
 		if (isset($request->ip) && isset($request->port)) {
 		// Peer is inserting a peer.
-		$indatabase = Peer::where('updated_at', '>=', $diff)->where('ip', $hostip)->where('port', $hostport)->get();
+		$indatabase = Peer::where('updated_at', '>=', $diff)->where('ip', $request->ip)->where('port', $request->port)->get();
 		if ($indatabase->count() > 0) {
 			$record = $indatabase->first();
 			$record->updated_at = $now;
 			$record->save();
-			return resonse()->json(['msg' => 'Updated your peer info', 'ip' => $record->ip, 'port' => $record->port]);
+			return response()->json(['msg' => 'Updated your peer info', 'ip' => $record->ip, 'port' => $record->port]);
 		}
 
 		$peer = new Peer();
@@ -35,7 +35,7 @@ class PeerController extends Controller
 
 		} else {
 		// No data provided. Use peer info.
-		$indatabase = Peer::where('updated_at', '>=', $diff)->where('ip', $hostip)->get();
+		$indatabase = Peer::where('updated_at', '>=', $diff)->where('ip', $hostip)->where('port', $hostport)->get();
 		if ($indatabase->count() > 0) {
 			$record = $indatabase->first();
 			$record->updated_at = $now;
@@ -62,5 +62,24 @@ class PeerController extends Controller
 			$output[] = ['ip' => $item->ip, 'port' => $item->port];
 		}
 		return response()->json($output);
+	}
+
+	/**
+	 * Clear the peer list, forcefully.
+	 */
+	public function invalidate() {
+		$now = Carbon::now();
+		$invalid = Carbon::now();
+		$diff = $now->subHour();
+		$data = Peer::where('updated_at','>=', $diff)->get();
+		$output = [];
+		$output['msg'] = 'Invalidating nodes';
+		foreach ($data as $item) {
+			$item->updated_at = $diff->subHour();
+			$item->save();
+			$output['peers'][] = ['ip' => $item->ip, 'port' => $item->port];
+		}
+		return response()->json($output);
+
 	}
 }
