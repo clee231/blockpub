@@ -55,7 +55,7 @@ class PeerController extends Controller
 
 	public function getPeers() {
 		$now = Carbon::now();
-		$diff = $now->subHour();
+		$diff = $now->subMinutes(10);
 		$data = Peer::where('updated_at','>=', $diff)->get();
 		$output = [];
 		foreach ($data as $item) {
